@@ -33,10 +33,10 @@ universalKnobs = ['colorspace', 'views']
 
 knobMatrix = {key: universalKnobs + value for key, value in knobMatrix.items()}
 presets = {
-    'exr' : [ ("colorspace", 'ACES - ACEScg'), ('channels', 'all'), ('datatype', '16 bit half') ],
-    'png' : [ ("colorspace", 'Output - Rec.709'), ('channels', 'rgba'), ('datatype','16 bit') ],
-    'dpx' : [ ("colorspace", 'Output - Rec.709'), ('channels', 'rgb'), ('datatype','10 bit'), ('big endian', True) ],
-    'jpeg' : [ ("colorspace", 'Output - sRGB'), ('channels', 'rgb') ]
+    'exr' : [ ("colorspace", 'scene_linear'), ('channels', 'all'), ('datatype', '16 bit half') ],
+    'png' : [ ("colorspace", 'color_picking'), ('channels', 'rgba'), ('datatype','16 bit') ],
+    'dpx' : [ ("colorspace", 'color_picking'), ('channels', 'rgb'), ('datatype','10 bit'), ('big endian', True) ],
+    'jpeg' : [ ("colorspace", 'matte_paint'), ('channels', 'rgb') ]
            }
 def apply_format_presets():
     node = nuke.thisNode()
