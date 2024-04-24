@@ -42,7 +42,7 @@ class CollectInstanceData(pyblish.api.InstancePlugin):
             "pixelAspect": pixel_aspect
 
         })
-
+        self.log.debug("Instance data: {}".format(instance.data))
         # add creator attributes to instance
         creator_attributes = instance.data["creator_attributes"]
         instance.data.update(creator_attributes)

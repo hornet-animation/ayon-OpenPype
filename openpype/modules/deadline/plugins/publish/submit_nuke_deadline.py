@@ -37,10 +37,12 @@ class NukeSubmitDeadline(pyblish.api.InstancePlugin,
     targets = ["local"]
 
     # presets
-    priority = 50
+    priority = 90
     chunk_size = 1
     concurrent_tasks = 1
-    group = ""
+    group = "nuke"
+    pool = "local"
+    secondary_pool = "all"
     department = ""
     limit_groups = {}
     use_gpu = False
@@ -306,8 +308,8 @@ class NukeSubmitDeadline(pyblish.api.InstancePlugin,
 
                 "Department": self.department,
 
-                "Pool": instance.data.get("primaryPool"),
-                "SecondaryPool": instance.data.get("secondaryPool"),
+                "Pool": self.pool,
+                "SecondaryPool": self.secondary_pool,
                 "Group": self.group,
 
                 "Plugin": "Nuke",

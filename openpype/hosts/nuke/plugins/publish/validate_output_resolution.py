@@ -24,7 +24,7 @@ class ValidateOutputResolution(
     optional = True
     families = ["render"]
     label = "Validate Write resolution"
-    hosts = ["nuke"]
+    hosts = []
     actions = [RepairAction]
 
     missing_msg = "Missing Reformat node in render group node"

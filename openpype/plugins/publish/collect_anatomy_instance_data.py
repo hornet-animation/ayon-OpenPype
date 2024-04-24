@@ -34,7 +34,7 @@ from openpype.client import (
     get_asset_name_identifier,
 )
 from openpype.pipeline.version_start import get_versioning_start
-
+import os
 
 class CollectAnatomyInstanceData(pyblish.api.ContextPlugin):
     """Collect Instance specific Anatomy data.
@@ -384,9 +384,8 @@ class CollectAnatomyInstanceData(pyblish.api.ContextPlugin):
 
         if not asset_doc or not task_name:
             return None
-
         asset_tasks = asset_doc["data"]["tasks"]
-        task_type = asset_tasks.get(task_name, {}).get("type")
+        task_type = asset_tasks.get(task_name, {}).get("type",os.environ["AVALON_TASK"])
         task_code = (
             project_task_types
             .get(task_type, {})

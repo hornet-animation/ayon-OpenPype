@@ -1235,6 +1235,7 @@ def create_write_node(
     input=None,
     prenodes=None,
     linked_knobs=None,
+    prerender=False,
     **kwargs
 ):
     ''' Creating write node which is group node
@@ -1285,11 +1286,12 @@ def create_write_node(
         plugin_name=plugin_name,
         subset=subset
     )
-
-    for knob in imageio_writes["knobs"]:
-        if knob["name"] == "file_type":
-            ext = knob["value"]
-
+    if not imageio_writes is None:
+        for knob in imageio_writes["knobs"]:
+            if knob["name"] == "file_type":
+                ext = knob["value"]
+    else:
+        ext = 'exr'
     data.update({
         "imageio_writes": imageio_writes,
         "ext": ext
@@ -1338,6 +1340,10 @@ def create_write_node(
             prev_node = last_prenode
 
         # creating write node
+        if not imageio_writes:
+            imageio_writes = {}
+        if not 'knobs' in imageio_writes.keys():
+            imageio_writes['knobs'] = {}
         write_node = now_node = add_write_node(
             "inside_{}".format(name),
             fpath,
@@ -1356,7 +1362,7 @@ def create_write_node(
         now_node.setInput(0, prev_node)
 
     # add divider
-    GN.addKnob(nuke.Text_Knob('', 'Rendering'))
+    #GN.addKnob(nuke.Text_Knob('', 'Rendering'))
 
     # Add linked knobs.
     linked_knob_names = []
@@ -1389,16 +1395,16 @@ def create_write_node(
                 link.setName(_k_name)
 
                 # make render
-                if "Render" in _k_name:
-                    link.setLabel("Render Local")
-                link.setFlag(0x1000)
-                GN.addKnob(link)
+                #if "Render" in _k_name:
+                #    link.setLabel("Render Local")
+                #link.setFlag(0x1000)
+                #GN.addKnob(link)
 
     # adding write to read button
-    add_button_write_to_read(GN)
+    #add_button_write_to_read(GN)
 
     # adding write to read button
-    add_button_clear_rendered(GN, os.path.dirname(fpath))
+    #add_button_clear_rendered(GN, os.path.dirname(fpath))
 
     # set tile color
     tile_color = next(
@@ -1407,9 +1413,12 @@ def create_write_node(
             if "tile_color" in k["name"]
         ), [255, 0, 0, 255]
     )
-    GN["tile_color"].setValue(
-        color_gui_to_int(tile_color))
-
+    if not prerender:
+        GN["tile_color"].setValue(
+            color_gui_to_int(tile_color))
+    if prerender:
+        GN["tile_color"].setValue(
+            color_gui_to_int([223, 255,0, 255]))
     return GN
 
 

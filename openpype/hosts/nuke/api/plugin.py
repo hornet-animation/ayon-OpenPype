@@ -332,13 +332,15 @@ class NukeWriteCreator(NukeCreator):
         return attr_defs
 
     def _get_render_target_enum(self):
-        rendering_targets = {
-            "local": "Local machine rendering",
-            "frames": "Use existing frames"
-        }
+        rendering_targets = {}
         if ("farm_rendering" in self.instance_attributes):
             rendering_targets["frames_farm"] = "Use existing frames - farm"
             rendering_targets["farm"] = "Farm rendering"
+
+        rendering_targets.update({
+            "local": "Local machine rendering",
+            "frames": "Use existing frames"
+        })
 
         return EnumDef(
             "render_target",

@@ -2251,15 +2251,20 @@ class CreateContext:
 
         task_names_by_asset_name = {}
         for instance in instances:
+
             task_name = instance.get("task")
             if AYON_SERVER_ENABLED:
                 asset_name = instance.get("folderPath")
             else:
                 asset_name = instance.get("asset")
             if asset_name:
+                print("HORNET <<<<<<")
+                print(asset_name)
+                print(task_name)
+                print("HORNET <<<<<<")
                 task_names_by_asset_name[asset_name] = set()
                 if task_name:
-                    task_names_by_asset_name[asset_name].add(task_name)
+                    task_names_by_asset_name[asset_name].add(task_name if type(task_name) is str else task_name['name'])
 
         asset_names = {
             asset_name
@@ -2304,9 +2309,9 @@ class CreateContext:
             task_name = instance["task"]
             if not task_name:
                 continue
-
-            if task_name not in task_names_by_asset_name[asset_name]:
-                instance.set_task_invalid(True)
+            
+           # if type(asset_name) is str and task_name not in task_names_by_asset_name[asset_name]:
+            #    instance.set_task_invalid(True)
 
     def save_changes(self):
         """Save changes. Update all changed values."""

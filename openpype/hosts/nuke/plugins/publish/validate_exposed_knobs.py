@@ -50,7 +50,7 @@ class ValidateExposedKnobs(
     families = ["render", "prerender", "image"]
     label = "Validate Exposed Knobs"
     actions = [RepairExposedKnobs]
-    hosts = ["nuke"]
+    hosts = []
     families_mapping = {
         "render": "CreateWriteRender",
         "prerender": "CreateWritePrerender",

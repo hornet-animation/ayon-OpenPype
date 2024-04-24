@@ -22,7 +22,7 @@ class CollectNukeWrites(pyblish.api.InstancePlugin,
 
         group_node = instance.data["transientData"]["node"]
         render_target = instance.data["render_target"]
-
+        self.log.info("render_target: {}".format(render_target))
         write_node = self._write_node_helper(instance)
 
         if write_node is None:
@@ -112,9 +112,20 @@ class CollectNukeWrites(pyblish.api.InstancePlugin,
             # return cashed write node
             return self._frame_ranges[instance_name]
 
+        # from publish range on Group
         write_node = self._write_node_helper(instance)
-
+        if write_node.name().startswith('inside_'):
+            group_node = nuke.toNode(write_node.name()[7:])
+            self.log.info("Group node: %s" % group_node.name())
+        if group_node.knob('usePublishRange').value() == True:
+            first_frame = int(group_node['publishFirst'].value())
+            last_frame = int(group_node['publishLast'].value())
+            self.log.info(f"first frame: {first_frame}, last frame: {last_frame}")
+            self._frame_ranges[instance_name] = (first_frame, last_frame)
+            self.log.info("Using publish range from write node")
+            return first_frame, last_frame
         # Get frame range from workfile
+        self.log.info("Using frame range from workfile")
         first_frame = int(nuke.root()["first_frame"].getValue())
         last_frame = int(nuke.root()["last_frame"].getValue())
 
