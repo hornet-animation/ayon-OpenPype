@@ -68,7 +68,9 @@ class MayaPluginInfo(object):
     UsingRenderLayers = attr.ib(default=True)
     RenderLayer = attr.ib(default=None)  # Render only this layer
     Renderer = attr.ib(default=None)
-    ProjectPath = attr.ib(default=None)  # Resolve relative references
+    ProjectPath = attr.ib(default=None)
+    UseLocalAssetCaching = attr.ib(default=False)
+    LocalRendering = attr.ib(default=True)
     # Include all lights flag
     RenderSetupIncludeLights = attr.ib(
         default="1", validator=_validate_deadline_bool_value)
@@ -279,7 +281,8 @@ class MayaSubmitDeadline(abstract_submit_deadline.AbstractSubmitDeadline,
             RenderSetupIncludeLights=rs_include_lights,  # noqa
             ProjectPath=context.data["workspaceDir"],
             UsingRenderLayers=True,
-            StrictErrorChecking=strict_error_checking
+            StrictErrorChecking=strict_error_checking,
+            LocalRendering = True
         )
 
         plugin_payload = attr.asdict(plugin_info)
