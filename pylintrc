@@ -1,0 +1,19 @@
+[MASTER]
+disable=invalid-name
+max-nested-blocks=3
+max-line-length=120
+
+[MESSAGES CONTROL]
+enable=missing-docstring
+disable=C0103,W0201,C0209,E0401,C0413,W4901,W0702,W0212
+
+
+[FORMAT]
+
+bad-names=_,
+
+output-format=parseable
+
+# [REPORTS]
+
+# reports=yes
