@@ -234,10 +234,10 @@ class MayaSubmitDeadline(abstract_submit_deadline.AbstractSubmitDeadline,
         job_info.EnvironmentKeyValue["OPENPYPE_LOG_NO_COLORS"] = "1"
 
         # Adding file dependencies.
-        if not bool(os.environ.get("IS_TEST")) and self.asset_dependencies:
-            dependencies = instance.context.data["fileDependencies"]
-            for dependency in dependencies:
-                job_info.AssetDependency += dependency
+        #if not bool(os.environ.get("IS_TEST")) and self.asset_dependencies:
+        #    dependencies = instance.context.data["fileDependencies"]
+        #   for dependency in dependencies:
+        #        job_info.AssetDependency += dependency
 
         # Add list of expected files to job
         # ---------------------------------
@@ -574,9 +574,9 @@ class MayaSubmitDeadline(abstract_submit_deadline.AbstractSubmitDeadline,
 
         job_info = copy.deepcopy(self.job_info)
 
-        if not bool(os.environ.get("IS_TEST")) and self.asset_dependencies:
+        #if not bool(os.environ.get("IS_TEST")) and self.asset_dependencies:
             # Asset dependency to wait for at least the scene file to sync.
-            job_info.AssetDependency += self.scene_path
+        #    job_info.AssetDependency += self.scene_path
 
         # Get layer prefix
         renderlayer = self._instance.data["setMembers"]
