@@ -11,21 +11,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      # - name: Set up Python
-      #   uses: actions/setup-python@v2
-      #   with:
-      #     python-version: 3.9.11
-
-      # - name: Install dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     If (Test-Path "requirements.txt") { pip install -r requirements.txt }
-
-      # - name: Run pylint on openpype and server_addon folders
-      #   run: |
-      #     pylint --rcfile=.pylintrc --output-format=parseable --exit-zero openpype server_addon
-
       - name: Build
         run: |
           rootPath=$(pwd)
@@ -84,3 +69,17 @@ jobs:
           aws s3 sync $sourcePath $destinationPath   
           echo "$sourcePath --> $destinationPath"
           
+  depoly:
+    runs-on: deploy-linux
+    needs: build
+    steps:
+    - name: Download from S3
+      run: |
+        linuxBuildVersion="${{ vars.BUILD_VERSION }}.${{ github.run_number }}"          
+        sourcePath="${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"       
+        destinationPath="${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"
+        rm -rf   $devPath
+        mkdir -p $devPath
+
+        aws s3 cp $sourcePath $destinationPath --recursive           
+        cp -al --no-preserve=mode $destinationPath/*  $devPath             
