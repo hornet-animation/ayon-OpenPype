@@ -57,3 +57,18 @@ jobs:
           $destinationPath = "${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"
           & $awsCliPath s3 sync $sourcePath $destinationPath
           echo "$sourcePath --> $destinationPath"
+
+  depoly:
+    runs-on: deploy-linux
+    needs: build
+    steps:
+    - name: Download from S3
+      run: |
+        linuxBuildVersion="${{ vars.BUILD_VERSION }}.${{ github.run_number }}"          
+        sourcePath="${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"       
+        destinationPath="${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"
+        rm -rf   $devPath
+        mkdir -p $devPath
+
+        aws s3 cp $sourcePath $destinationPath --recursive           
+        cp -al --no-preserve=mode $destinationPath/*  $devPath           

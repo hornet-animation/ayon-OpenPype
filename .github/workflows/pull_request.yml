@@ -28,41 +28,45 @@ jobs:
 
       - name: Build
         run: |
-          $rootPath = Get-Location
-          $serverAddonsPath = "$rootPath\server_addon"
-          $buildFolderPath = Join-Path -Path $rootPath -ChildPath "build"
-          # Create the build folder if it doesn't exist
-          if (-not (Test-Path -Path $buildFolderPath -PathType Container)) {
-            New-Item -Path $buildFolderPath -ItemType Directory | Out-Null
-          }
-          $addonItems = Get-ChildItem -Path $serverAddonsPath
-          foreach ($addonItem in $addonItems) {
-            if ($addonItem.PSIsContainer) {
-              $versionFilePath = Join-Path -Path $addonItem.FullName -ChildPath "server/version.py"
-              if (Test-Path -Path $versionFilePath -PathType Leaf) {
-                $versionFileContent = Get-Content -Path $versionFilePath
-                $versionPattern1 = '__version__ = "(?<version>\d+\.\d+\.\d+)"'
-                $versionPattern2 = '__version__ = "(?<version>\d+\.\d+\.\d+-\w+\.\d+)"'
-                $versionMatch1 = [regex]::Match($versionFileContent, $versionPattern1)
-                $versionMatch2 = [regex]::Match($versionFileContent, $versionPattern2)
-                $versionMatch = [regex]::Match($versionFileContent, $versionPattern)
-                if ($versionMatch1.Success) {
-                  $version = $versionMatch1.Groups["version"].Value
-                } elseif ($versionMatch2.Success) {
-                  $version = $versionMatch2.Groups["version"].Value
-                } else {
-                  $version = "Version not found"
-                }
-                $addonBuildFolderPath = Join-Path -Path $buildFolderPath -ChildPath "$addonItem/$version"
-                # Create the addon build folder if it doesn't exist
-                if (-not (Test-Path -Path $addonBuildFolderPath -PathType Container)) {
-                  New-Item -Path $addonBuildFolderPath -ItemType Directory | Out-Null
-                }
-                # Copy the contents of the addon item to the addon build folder
-                Copy-Item -Path "$serverAddonsPath/$addonItem/server/*" -Destination $addonBuildFolderPath -Recurse -Force
-              }
-            }
-          }
+          rootPath=$(pwd)
+          serverAddonsPath="$rootPath/server_addon"
+          buildFolderPath="$rootPath/build"
+
+          if [ ! -d "$buildFolderPath" ]; then
+              mkdir -p "$buildFolderPath"
+          fi
+
+          # Loop through each addon directory
+          for addonItem in "$serverAddonsPath"/*; do
+              if [ -d "$addonItem" ]; then
+                  versionFilePath="$addonItem/server/version.py"
+
+                  if [ -f "$versionFilePath" ]; then
+                      versionFileContent=$(cat "$versionFilePath")
+                      versionPattern1='__version__ = "(?<version>[0-9]+\.[0-9]+\.[0-9]+)"'
+                      versionPattern2='__version__ = "(?<version>[0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z]+\.[0-9]+)"'
+
+                      # Extract the version using regex
+                      if [[ $versionFileContent =~ $versionPattern1 ]]; then
+                          version="${BASH_REMATCH[1]}"
+                      elif [[ $versionFileContent =~ $versionPattern2 ]]; then
+                          version="${BASH_REMATCH[1]}"
+                      else
+                          version="Version not found"
+                      fi
+
+                      addonBuildFolderPath="$buildFolderPath/$addonItem/$(basename "$addonItem")/$version"
+
+                      # Create the addon build folder if it doesn't exist
+                      if [ ! -d "$addonBuildFolderPath" ]; then
+                          mkdir -p "$addonBuildFolderPath"
+                      fi
+
+                      # Copy the contents of the addon item to the addon build folder
+                      cp -r "$addonItem/server/"* "$addonBuildFolderPath/"
+                  fi
+              fi
+          done
       # - name: Upload to S3
       #   run: |
       #     $current_dir = Get-Location
@@ -71,3 +75,12 @@ jobs:
       #     $destinationPath = "${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"
       #     & $awsCliPath s3 sync $sourcePath $destinationPath
       #     echo "$sourcePath --> $destinationPath"
+
+      - name: Upload to S3
+        run: |
+          rootPath=$(pwd)
+          sourcePath=="$rootPath/build"
+          destinationPath="${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"
+          aws s3 sync $sourcePath $destinationPath   
+          echo "$sourcePath --> $destinationPath"
+          
