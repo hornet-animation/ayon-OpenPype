@@ -10,7 +10,7 @@ jobs:
     runs-on:  deploy-linux 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       - name: Build
         run: |
           rootPath=$(pwd)
@@ -52,15 +52,6 @@ jobs:
                   fi
               fi
           done
-      # - name: Upload to S3
-      #   run: |
-      #     $current_dir = Get-Location
-      #     $awsCliPath = "C:\Program Files\Amazon\AWSCLIV2\aws.exe"
-      #     $sourcePath = "$current_dir/build"
-      #     $destinationPath = "${{ vars.S3_BUCKET }}/${{ vars.BUILDS }}/server-addons"
-      #     & $awsCliPath s3 sync $sourcePath $destinationPath
-      #     echo "$sourcePath --> $destinationPath"
-
       - name: Upload to S3
         run: |
           rootPath=$(pwd)
